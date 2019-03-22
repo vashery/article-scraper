@@ -1,0 +1,56 @@
+<div class="ui container">
+  <div class="ui items">
+    {{#each articles}}
+    <br>
+    <div class="item">
+      <div class="image">
+        <img href={{this.link}} src="{{this.image}}">
+      </div>
+      <div class="content">
+        <a href={{this.link}} class="header">{{this.title}}</a>
+        <div class="description">
+          <p>{{this.summary}}</p>
+        </div>
+      </div>
+      <button id={{this._id}} class="ui button">Comment</button>
+    </div>
+    <br>
+    {{/each}}
+
+  </div>
+</div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $("body").on("click", ".button", function () {
+      let clickid = $(this).attr("id")
+      $.ajax({
+        url: '/api/articles/' + clickid,
+        type: 'GET',
+        success: function (result) {
+          $("#modid").children(".header").text(result.title)
+          for (var i = 0; i < result.comment.length; i++) {
+            $("#scrollcon").append(
+            "<div class='item'>" +
+              "<div class='content'>" +
+                "<div class='description'>" +
+                  "<p>" + result.comment[i].body +
+                  "</p>" +
+                  "<button id=" + result.comment[i].body._id + " class='ui button'>Delete</button>" +
+                "</div>" +
+              "</div>" +
+            "</div>" 
+            )
+            console.log(result.comment[i].body)
+          }
+          console.log(result);
+          $('.ui.modal').modal('show')
+        }
+      });
+        
+    })
+  });
+
+</script>
