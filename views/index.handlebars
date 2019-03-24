@@ -30,25 +30,29 @@
         url: '/api/articles/' + clickid,
         type: 'GET',
         success: function (result) {
-          $("#modid").children(".header").text(result.title)
+          if (result.title) {
+            $("#modid").children(".header").text(result.title)
+          }
+          else {
+            $("#modid").children(".header").text("Placeholder Title")
+          }
           $("#commentbutton").attr("postid", result._id)
+          $("#scrollcon").empty()
           if (result.comment) {
-          for (var i = 0; i < result.comment.length; i++) {
-            $("#scrollcon").append(
-              "<div postid=" + clickid + " class='item'>" +
-              "<div class='content'>" +
-              "<div class='description'>" +
-              "<p>" + result.comment[i].body +
-              "</p>" +
-              "<button id=" + result.comment[i]._id + " class='ui delbutton button'>Delete</button>" +
-              "</div>" +
-              "</div>" +
-              "</div>"
-            )
-            //console.log(result.comment[i].body)
+            for (var i = 0; i < result.comment.length; i++) {
+              $("#scrollcon").append(
+                "<div postid=" + clickid + " class='item'>" +
+                "<div class='content'>" +
+                "<div class='description'>" +
+                "<p>" + result.comment[i].body +
+                "</p>" +
+                "<button id=" + result.comment[i]._id + " class='ui delbutton button'>Delete</button>" +
+                "</div>" +
+                "</div>" +
+                "</div>"
+              )
+            }
           }
-          }
-          //console.log(result);
           $('.ui.modal').modal('show')
         }
       });
@@ -56,11 +60,13 @@
     })
     $("body").on("click", ".delbutton", function () {
       comid = $(this).attr("id")
+      postid = $(this).parent().parent().parent().attr("postid")
+      currpost = $(this).parent().parent().parent()
       $.ajax({
         url: '/api/comments/' + comid,
         type: 'DELETE',
         success: function (result) {
-          $("#" + comid).remove()
+          currpost.remove()
         }
       })
 
@@ -68,13 +74,43 @@
     $("body").on("click", "#commentbutton", function () {
       var currpostid = $(this).attr("postid")
       var text = $(this).parent().children().children("textarea").val()
-      console.log(text)
+      var textfield = $(this).parent().children().children("textarea")
       $.ajax({
         url: '/api/comments/' + currpostid,
         type: 'POST',
-        data: {body: text},
+        data: { body: text },
         success: function (result) {
-          //$("#" + comid).remove()
+          textfield.val('')
+          $.ajax({
+            url: '/api/articles/' + currpostid,
+            type: 'GET',
+            success: function (result) {
+              if (result.title) {
+                $("#modid").children(".header").text(result.title)
+              }
+              else {
+                $("#modid").children(".header").text("Placeholder Title")
+              }
+              $("#commentbutton").attr("postid", result._id)
+              $("#scrollcon").empty()
+              if (result.comment) {
+                for (var i = 0; i < result.comment.length; i++) {
+                  $("#scrollcon").append(
+                    "<div postid=" + currpostid + " class='item'>" +
+                    "<div class='content'>" +
+                    "<div class='description'>" +
+                    "<p>" + result.comment[i].body +
+                    "</p>" +
+                    "<button id=" + result.comment[i]._id + " class='ui delbutton button'>Delete</button>" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>"
+                  )
+                }
+              }
+              $('.ui.modal').modal('show')
+            }
+          });
         }
       })
 
