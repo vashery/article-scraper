@@ -31,26 +31,55 @@
         type: 'GET',
         success: function (result) {
           $("#modid").children(".header").text(result.title)
+          $("#commentbutton").attr("postid", result._id)
+          if (result.comment) {
           for (var i = 0; i < result.comment.length; i++) {
             $("#scrollcon").append(
-            "<div class='item'>" +
+              "<div postid=" + clickid + " class='item'>" +
               "<div class='content'>" +
-                "<div class='description'>" +
-                  "<p>" + result.comment[i].body +
-                  "</p>" +
-                  "<button id=" + result.comment[i].body._id + " class='ui button'>Delete</button>" +
-                "</div>" +
+              "<div class='description'>" +
+              "<p>" + result.comment[i].body +
+              "</p>" +
+              "<button id=" + result.comment[i]._id + " class='ui delbutton button'>Delete</button>" +
               "</div>" +
-            "</div>" 
+              "</div>" +
+              "</div>"
             )
-            console.log(result.comment[i].body)
+            //console.log(result.comment[i].body)
           }
-          console.log(result);
+          }
+          //console.log(result);
           $('.ui.modal').modal('show')
         }
       });
-        
+
     })
+    $("body").on("click", ".delbutton", function () {
+      comid = $(this).attr("id")
+      $.ajax({
+        url: '/api/comments/' + comid,
+        type: 'DELETE',
+        success: function (result) {
+          $("#" + comid).remove()
+        }
+      })
+
+    })
+    $("body").on("click", "#commentbutton", function () {
+      var currpostid = $(this).attr("postid")
+      var text = $(this).parent().children().children("textarea").val()
+      console.log(text)
+      $.ajax({
+        url: '/api/comments/' + currpostid,
+        type: 'POST',
+        data: {body: text},
+        success: function (result) {
+          //$("#" + comid).remove()
+        }
+      })
+
+    })
+
   });
 
 </script>

@@ -13,7 +13,7 @@ var axios = require("axios");
 //var db = require("./models");
 mongoose.connect("mongodb://localhost/article-scraper", { useNewUrlParser: true });
 
-var PORT = 3000;
+var PORT = 3003;
 
 // Initialize Express
 var app = express();
